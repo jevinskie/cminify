@@ -26,7 +26,7 @@
 #include <llvm/ADT/DenseSet.h>
 #include <llvm/ADT/MapVector.h>
 #include <llvm/ADT/STLExtras.h>
-#include <llvm/Support/Host.h>
+#include <llvm/TargetParser/Host.h>
 #include <llvm/Support/Path.h>
 #include <llvm/Support/raw_ostream.h>
 
@@ -45,16 +45,16 @@ std::unique_ptr<CompilerInvocation> buildCompilerInvocation(ArrayRef<const char 
   IntrusiveRefCntPtr<DiagnosticsEngine> diags(
       CompilerInstance::createDiagnostics(new DiagnosticOptions, new IgnoringDiagConsumer, true));
 
-  driver::Driver d(args[0], llvm::sys::getDefaultTargetTriple(), *diags, "cminify", llvm::vfs::getRealFileSystem());
+  clang::driver::Driver d{args[0], llvm::sys::getDefaultTargetTriple(), *diags, "cminify", llvm::vfs::getRealFileSystem()};
   d.setCheckInputsExist(false);
-  std::unique_ptr<driver::Compilation> comp(d.BuildCompilation(args));
+  std::unique_ptr<clang::driver::Compilation> comp(d.BuildCompilation(args));
   if (!comp)
     return nullptr;
-  const driver::JobList &jobs = comp->getJobs();
-  if (jobs.size() != 1 || !isa<driver::Command>(*jobs.begin()))
+  const clang::driver::JobList &jobs = comp->getJobs();
+  if (jobs.size() != 1 || !isa<clang::driver::Command>(*jobs.begin()))
     return nullptr;
 
-  const driver::Command &cmd = cast<driver::Command>(*jobs.begin());
+  const clang::driver::Command &cmd = cast<clang::driver::Command>(*jobs.begin());
   if (StringRef(cmd.getCreator().getName()) != "clang")
     return nullptr;
   const llvm::opt::ArgStringList &cc_args = cmd.getArguments();
@@ -268,13 +268,14 @@ int main(int argc, char *argv[]) {
   const char usage[] = R"(Usage: %s [-i] [-f fun]... a.c
 
 Options:
--i      edit a.c in place\n)";
+-i      edit a.c in place
+)";
   for (int i = 1; i < argc; i++) {
     StringRef opt(argv[i]);
     if (opt[0] != '-')
       args.push_back(argv[i]);
     else if (opt == "-h") {
-      fputs(usage, stdout);
+      printf(usage, getprogname());
       return 0;
     } else if (opt == "-i")
       inplace = true;

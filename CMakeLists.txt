@@ -8,6 +8,7 @@ set_property(TARGET cminify PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property(TARGET cminify PROPERTY CXX_EXTENSIONS OFF)
 
 find_package(Clang REQUIRED)
+find_package(LLVM REQUIRED)
 
 if(CLANG_LINK_CLANG_DYLIB)
   target_link_libraries(cminify PRIVATE clang-cpp)
