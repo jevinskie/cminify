@@ -1,0 +1,3 @@
+BasedOnStyle: LLVM
+UseTab: Never
+ColumnLimit: 120

@@ -50,7 +50,7 @@ if(NOT LLVM_ENABLE_RTTI)
   endif()
 endif()
 
-target_sources(cminify PRIVATE main.cc)
+target_sources(cminify PRIVATE cminify.cc)
 
 foreach(include_dir ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
   get_filename_component(include_dir_realpath ${include_dir} REALPATH)
